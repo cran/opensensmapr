@@ -155,8 +155,19 @@ parse_senseboxdata = function (boxdata) {
   if (!is.null(thebox$updatedAt))
     thebox$updatedAt = as.POSIXct(strptime(thebox$updatedAt, format = '%FT%T', tz = 'GMT'))
 
+  # create a dataframe of sensors
+  thebox$sensors = sensors %>%
+    recursive_lapply(function (x) if (is.null(x)) NA else x) %>% # replace NULLs with NA
+    lapply(as.data.frame, stringsAsFactors = F) %>%
+    dplyr::bind_rows(.) %>%
+    dplyr::select(phenomenon = title, id = X_id, unit, sensor = sensorType) %>%
+    list
+
   # extract metadata from sensors
-  thebox$phenomena = lapply(sensors, function(s) s$title) %>% unlist %>% list
+  thebox$phenomena = sensors %>%
+    stats::setNames(lapply(., function (s) s$`_id`)) %>%
+    lapply(function(s) s$title) %>%
+    unlist %>% list # convert to vector
 
   # FIXME: if one sensor has NA, max() returns bullshit
   get_last_measurement = function(s) {

@@ -22,8 +22,8 @@ plot.sensebox = function (x, ..., mar = c(2, 2, 1, 1)) {
 
   oldpar = par()
   par(mar = mar)
-  plot(world, col = 'gray', xlim = bbox[c(1, 3)], ylim = bbox[c(2, 4)], axes = T)
-  plot(geom, add = T, col = x$exposure)
+  plot(world, col = 'gray', xlim = bbox[c(1, 3)], ylim = bbox[c(2, 4)], axes = T, ...)
+  plot(geom, add = T, col = x$exposure, ...)
   legend('left', legend = levels(x$exposure), col = 1:length(x$exposure), pch = 1)
   par(mar = oldpar$mar)
 
@@ -71,8 +71,6 @@ summary.sensebox = function(object, ...) {
   invisible(object)
 }
 
-# ==============================================================================
-#
 #' Converts a foreign object to a sensebox data.frame.
 #' @param x A data.frame to attach the class to
 #' @export
@@ -80,43 +78,4 @@ osem_as_sensebox = function(x) {
   ret = as.data.frame(x)
   class(ret) = c('sensebox', class(x))
   ret
-}
-
-#' Return rows with matching conditions, while maintaining class & attributes
-#' @param .data A sensebox data.frame to filter
-#' @param .dots see corresponding function in package \code{\link{dplyr}}
-#' @param ... other arguments
-#' @seealso \code{\link[dplyr]{filter}}
-#' @export
-filter.sensebox = dplyr_class_wrapper(osem_as_sensebox)
-
-#' Add new variables to the data, while maintaining class & attributes
-#' @param .data A sensebox data.frame to mutate
-#' @param .dots see corresponding function in package \code{\link{dplyr}}
-#' @param ... other arguments
-#' @seealso \code{\link[dplyr]{mutate}}
-#' @export
-mutate.sensebox = dplyr_class_wrapper(osem_as_sensebox)
-
-# ==============================================================================
-#
-#' maintains class / attributes after subsetting
-#' @noRd
-#' @export
-`[.sensebox` = function(x, i, ...) {
-  s = NextMethod('[')
-  mostattributes(s) = attributes(s)
-  s
-}
-
-# ==============================================================================
-#
-#' Convert a \code{sensebox} dataframe to an \code{\link[sf]{st_sf}} object.
-#'
-#' @param x The object to convert
-#' @param ... maybe more objects to convert
-#' @return The object with an st_geometry column attached.
-#' @export
-st_as_sf.sensebox = function (x, ...) {
-  NextMethod(x, ..., coords = c('lon', 'lat'), crs = 4326)
 }

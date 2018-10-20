@@ -53,7 +53,7 @@ berlin = st_point(c(13.4034, 52.5120)) %>%
 pm25 = osem_measurements(
   berlin,
   phenomenon = 'PM2.5',
-  from = now() - days(20), # defaults to 2 days
+  from = now() - days(3), # defaults to 2 days
   to = now()
 )
 

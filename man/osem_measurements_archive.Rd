@@ -46,11 +46,11 @@ but continue the remaining download.
 }}
 
 \examples{
-# fetch measurements for a single day
-box = osem_box('593bcd656ccf3b0011791f5a')
-m = osem_measurements_archive(box, as.POSIXlt('2018-09-13'))
-
 \donttest{
+  # fetch measurements for a single day
+  box = osem_box('593bcd656ccf3b0011791f5a')
+  m = osem_measurements_archive(box, as.POSIXlt('2018-09-13'))
+
   # fetch measurements for a date range and selected sensors
   sensors = ~ phenomenon \%in\% c('Temperatur', 'Beleuchtungsstärke')
   m = osem_measurements_archive(

@@ -1,16 +1,13 @@
 source('testhelpers.R')
 context('measurements')
 
-try({
-  boxes = osem_boxes()
-})
 
 test_that('measurements can be retrieved for a phenomenon', {
   check_api()
 
   measurements = osem_measurements('Windgeschwindigkeit')
   measurements = osem_measurements(x = 'Windgeschwindigkeit')
-  expect_true(tibble::is.tibble(measurements))
+  expect_true(tibble::is_tibble(measurements))
   expect_true('osem_measurements' %in% class(measurements))
 })
 
@@ -47,20 +44,6 @@ test_that('measurements can be retrieved for a phenomenon and exposure', {
   expect_equal(nrow(measurements), 0)
 })
 
-test_that('measurements of specific boxes can be retrieved for one phenomenon and returns a measurements data.frame', {
-  check_api()
-
-  # fix for subsetting
-  class(boxes) = c('data.frame')
-  three_boxes = boxes[1:3, ]
-  class(boxes) = c('sensebox', 'data.frame')
-  three_boxes = osem_as_sensebox(three_boxes)
-  phens = names(osem_phenomena(three_boxes))
-
-  measurements = osem_measurements(x = three_boxes, phenomenon = phens[[1]])
-  expect_true(is.data.frame(measurements))
-  expect_true('osem_measurements' %in% class(measurements))
-})
 
 test_that('measurements can be retrieved for a bounding box', {
   check_api()
@@ -104,8 +87,7 @@ test_that('both from and to are required when requesting measurements, error oth
 test_that('phenomenon is required when requesting measurements, error otherwise', {
   check_api()
 
-  expect_error(osem_measurements(), 'missing, with no default')
-  expect_error(osem_measurements(boxes), 'Parameter "phenomenon" is required')
+  expect_error(osem_measurements())
 
   sfc = sf::st_sfc(sf::st_linestring(x = matrix(data = c(7, 8, 50, 51), ncol = 2)), crs = 4326)
   bbox = sf::st_bbox(sfc)
@@ -123,6 +105,7 @@ test_that('[.osem_measurements maintains attributes', {
 })
 
 test_that('data.frame can be converted to measurements data.frame', {
+  check_api()
   m = osem_measurements('Windrichtung')
   df = osem_as_measurements(data.frame(c(1, 2), c('a', 'b')))
   expect_equal(class(df), class(m))

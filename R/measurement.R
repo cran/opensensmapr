@@ -39,7 +39,7 @@ osem_measurements = function (x, ...) UseMethod('osem_measurements')
 #' @describeIn osem_measurements Get measurements from \strong{all} senseBoxes.
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'   # get measurements from all boxes on the phenomenon 'PM10' from the last 48h
 #'   m = osem_measurements('PM10')
 #'
@@ -72,7 +72,7 @@ osem_measurements.default = function (x, ...) {
 #' @describeIn osem_measurements Get measurements by a spatial filter.
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'   # get measurements from sensors within a custom WGS84 bounding box
 #'   bbox = structure(c(7, 51, 8, 52), class = 'bbox')
 #'   m = osem_measurements(bbox, 'Temperatur')
@@ -80,6 +80,7 @@ osem_measurements.default = function (x, ...) {
 #'   # construct a bounding box 12km around berlin using the sf package,
 #'   # and get measurements from stations within that box
 #'   library(sf)
+#'   library(units)
 #'   bbox2 = st_point(c(13.4034, 52.5120)) %>%
 #'     st_sfc(crs = 4326) %>%
 #'     st_transform(3857) %>% # allow setting a buffer in meters
@@ -98,7 +99,7 @@ osem_measurements.bbox = function (x, phenomenon, exposure = NA,
                                    from = NA, to = NA, columns = NA,
                                    ...,
                                    endpoint = osem_endpoint(),
-                                   progress = T,
+                                   progress = TRUE,
                                    cache = NA) {
   bbox = x
   environment() %>%
@@ -136,7 +137,7 @@ osem_measurements.sensebox = function (x, phenomenon, exposure = NA,
                                        from = NA, to = NA, columns = NA,
                                        ...,
                                        endpoint = osem_endpoint(),
-                                       progress = T,
+                                       progress = TRUE,
                                        cache = NA) {
   boxes = x
   environment() %>%

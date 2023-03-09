@@ -1,14 +1,5 @@
 #' @export
 plot.sensebox = function (x, ..., mar = c(2, 2, 1, 1)) {
-  if (
-    !requireNamespace('sf', quietly = TRUE) ||
-    !requireNamespace('maps', quietly = TRUE) ||
-    !requireNamespace('maptools', quietly = TRUE) ||
-    !requireNamespace('rgeos', quietly = TRUE)
-  ) {
-    stop('this functions requires additional packages. install them with
-    install.packages(c("sf", "maps", "maptools", "rgeos"))')
-  }
 
   geom = x %>%
     sf::st_as_sf() %>%
@@ -20,12 +11,12 @@ plot.sensebox = function (x, ..., mar = c(2, 2, 1, 1)) {
     sf::st_as_sf() %>%
     sf::st_geometry()
 
-  oldpar = par()
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
   par(mar = mar)
-  plot(world, col = 'gray', xlim = bbox[c(1, 3)], ylim = bbox[c(2, 4)], axes = T, ...)
-  plot(geom, add = T, col = x$exposure, ...)
+  plot(world, col = 'gray', xlim = bbox[c(1, 3)], ylim = bbox[c(2, 4)], axes = TRUE, ...)
+  plot(geom, add = TRUE, col = x$exposure, ...)
   legend('left', legend = levels(x$exposure), col = 1:length(x$exposure), pch = 1)
-  par(mar = oldpar$mar)
 
   invisible(x)
 }
@@ -39,7 +30,7 @@ print.sensebox = function(x, columns = c('name', 'exposure', 'lastMeasurement', 
 
 #' @export
 summary.sensebox = function(object, ...) {
-  cat('boxes total:', nrow(object), fill = T)
+  cat('boxes total:', nrow(object), fill = TRUE)
   cat('\nboxes by exposure:')
   table(object$exposure) %>% print()
   cat('\nboxes by model:')
@@ -59,10 +50,10 @@ summary.sensebox = function(object, ...) {
 
   oldest = object[object$createdAt == min(object$createdAt), ]
   newest = object[object$createdAt == max(object$createdAt), ]
-  cat('oldest box:', format(oldest$createdAt, '%F %T'), paste0('(', oldest$name, ')'), fill = T)
-  cat('newest box:', format(newest$createdAt, '%F %T'), paste0('(', newest$name, ')'), fill = T)
+  cat('oldest box:', format(oldest$createdAt, '%F %T'), paste0('(', oldest$name, ')'), fill = TRUE)
+  cat('newest box:', format(newest$createdAt, '%F %T'), paste0('(', newest$name, ')'), fill = TRUE)
 
-  cat('\nsensors per box:', fill = T)
+  cat('\nsensors per box:', fill = TRUE)
   lapply(object$phenomena, length) %>%
     as.numeric() %>%
     summary() %>%
@@ -73,6 +64,7 @@ summary.sensebox = function(object, ...) {
 
 #' Converts a foreign object to a sensebox data.frame.
 #' @param x A data.frame to attach the class to
+#' @return data.frame of class \code{sensebox}
 #' @export
 osem_as_sensebox = function(x) {
   ret = as.data.frame(x)

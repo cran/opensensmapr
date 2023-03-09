@@ -3,7 +3,6 @@
 [![CRAN status](https://www.r-pkg.org/badges/version/opensensmapr)](https://cran.r-project.org/package=opensensmapr)
 [![Travis build status](https://travis-ci.org/sensebox/opensensmapR.svg?branch=master)](https://travis-ci.org/sensebox/opensensmapR)
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/dtad4ves48gebss7/branch/master?svg=true)](https://ci.appveyor.com/project/noerw/opensensmapr/branch/master)
-[![Coverage status](https://codecov.io/gh/sensebox/opensensmapR/branch/master/graph/badge.svg)](https://codecov.io/github/sensebox/opensensmapR?branch=master)
 
 This R package ingests data from the API of [opensensemap.org][osem] for analysis in R.
 
@@ -34,9 +33,9 @@ There are also vignettes showcasing applications of this package:
 - [Exploring the openSenseMap dataset][osem-intro]: Showcase of included helper functions
 - [Caching openSenseMap Data for reproducibility][osem-serialization]
 
-[osem-intro]: https://sensebox.github.com/opensensmapR/inst/doc/osem-intro.html
-[osem-history]: https://sensebox.github.com/opensensmapR/inst/doc/osem-history.html
-[osem-serialization]: https://sensebox.github.com/opensensmapR/inst/doc/osem-serialization.html
+[osem-intro]: https://sensebox.github.io/opensensmapR/inst/doc/osem-intro.html
+[osem-history]: https://sensebox.github.io/opensensmapR/inst/doc/osem-history.html
+[osem-serialization]: https://sensebox.github.io/opensensmapR/inst/doc/osem-serialization.html
 
 If you used this package for an analysis and think it could serve as a good
 example or showcase, feel free to add a vignette to the package via a [PR](#contribute)!
@@ -59,16 +58,16 @@ devtools::install_github('sensebox/opensensmapr@development') # bleeding edge ve
 
 ## Changelog
 
-This project adheres to semantic versioning, for changes in recent versions please consult [CHANGES.md](CHANGES.md).
+This project adheres to semantic versioning, for changes in recent versions please consult [NEWS.md](NEWS.md).
 
 ## Contributing & Development
 
 Contributions are very welcome!
-When submitting a patch, please follow the existing [code style](.lintr),
+When submitting a patch, please follow the existing code stlye,
 and run `R CMD check --no-vignettes .` on the package.
 Where feasible, also add tests for the added / changed functionality in `tests/testthat`.
 
-Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md).
+Please note that this project is released with a Contributor Code of Conduct.
 By participating in this project you agree to abide by its terms.
 
 ### development environment
@@ -103,10 +102,10 @@ R CMD check --no-vignettes ../opensensmapr_*.tar.gz
 
 To create a release:
 
-0. make shure you are on master branch
+0. make sure you are on master branch
 1. run the tests and checks as described above
 2. bump the version in `DESCRIPTION`
-3. update `CHANGES.md`
+3. update `NEWS.md`
 3. rebuild the documentation: `R -e 'devtools::document()'`
 4. build the package again with the new version: `R CMD build . --no-build-vignettes`
 5. tag the commit with the new version: `git tag v0.5.0`

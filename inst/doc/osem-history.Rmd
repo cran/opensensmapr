@@ -43,7 +43,10 @@ So the first step is to retrieve *all the boxes*:
 ```{r download}
 # if you want to see results for a specific subset of boxes,
 # just specify a filter such as grouptag='ifgi' here
-boxes = osem_boxes()
+
+# boxes = osem_boxes(cache = '.')
+boxes = readRDS('boxes_precomputed.rds')  # read precomputed file to save resources 
+
 ```
 
 # Plot count of boxes by time {.tabset}
@@ -68,7 +71,7 @@ ggplot(exposure_counts, aes(x = createdAt, y = count, colour = exposure)) +
 Outdoor boxes are growing *fast*!
 We can also see the introduction of `mobile` sensor "stations" in 2017. While
 mobile boxes are still few, we can expect a quick rise in 2018 once the new
-[senseBox MCU with GPS support is released](https://sensebox.de/blog/2018-03-06-senseBox_MCU).
+senseBox MCU with GPS support is released.
 
 Let's have a quick summary:
 ```{r exposure_summary}
@@ -93,7 +96,7 @@ inconsistent (`Luftdaten`, `luftdaten.info`, ...)
 grouptag_counts = boxes %>%
   group_by(grouptag) %>%
   # only include grouptags with 8 or more members
-  filter(length(grouptag) >= 8 && !is.na(grouptag)) %>%
+  filter(length(grouptag) >= 8 & !is.na(grouptag)) %>%
   mutate(count = row_number(createdAt))
 
 # helper for sorting the grouptags by boxcount
@@ -163,7 +166,7 @@ ggplot(boxes_by_date, aes(x = as.Date(week), colour = event)) +
 
 We see a sudden rise in early 2017, which lines up with the fast growing grouptag `Luftdaten`.
 This was enabled by an integration of openSenseMap.org into the firmware of the
-air quality monitoring project [luftdaten.info](https://luftdaten.info).
+air quality monitoring project [luftdaten.info](https://sensor.community/de/).
 The dips in mid 2017 and early 2018 could possibly be explained by production/delivery issues
 of the senseBox hardware, but I have no data on the exact time frames to verify.
 
@@ -192,7 +195,7 @@ spanning a large chunk of openSenseMap's existence.
 duration = boxes %>%
   group_by(grouptag) %>%
   # only include grouptags with 8 or more members
-  filter(length(grouptag) >= 8 && !is.na(grouptag) && !is.na(updatedAt)) %>%
+  filter(length(grouptag) >= 8 & !is.na(grouptag) & !is.na(updatedAt)) %>%
   mutate(duration = difftime(updatedAt, createdAt, units='days'))
   
 ggplot(duration, aes(x = grouptag, y = duration)) +

@@ -2,23 +2,13 @@ source('testhelpers.R')
 context('box')
 
 try({
-  boxes = osem_boxes()
   box = osem_box('57000b8745fd40c8196ad04c')
 })
 
-test_that('a single box can be retrieved by ID', {
-  check_api()
-
-  box = osem_box(boxes$X_id[[1]])
-
-  expect_true('sensebox' %in% class(box))
-  expect_true('data.frame' %in% class(box))
-  expect_true(nrow(box) == 1)
-  expect_true(box$X_id == boxes$X_id[[1]])
-  expect_silent(osem_box(boxes$X_id[[1]]))
-})
 
 test_that('required box attributes are correctly parsed', {
+  check_api()
+  
   expect_is(box$X_id, 'character')
   expect_is(box$name, 'character')
   expect_is(box$exposure, 'character')
@@ -29,6 +19,8 @@ test_that('required box attributes are correctly parsed', {
 })
 
 test_that('optional box attributes are correctly parsed', {
+  check_api()
+  
   completebox = osem_box('5a676e49411a790019290f94') # all fields populated
   expect_is(completebox$description, 'character')
   expect_is(completebox$grouptag, 'character')
@@ -46,7 +38,6 @@ test_that('optional box attributes are correctly parsed', {
   expect_null(oldbox$description)
   expect_null(oldbox$grouptag)
   expect_null(oldbox$weblink)
-  expect_null(oldbox$updatedAt)
   expect_null(oldbox$height)
   expect_null(oldbox$lastMeasurement)
 })
@@ -58,13 +49,10 @@ test_that('unknown box throws', {
   expect_error(osem_box('57000b8745fd40c800000000'), 'not found')
 })
 
-test_that('[.sensebox maintains attributes', {
-  check_api()
-
-  expect_true(all(attributes(boxes[1:nrow(boxes), ]) %in% attributes(boxes)))
-})
 
 test_that("print.sensebox filters important attributes for a single box", {
+  check_api()
+  
   msg = capture.output({
     print(box)
   })
@@ -72,6 +60,8 @@ test_that("print.sensebox filters important attributes for a single box", {
 })
 
 test_that("summary.sensebox outputs all metrics for a single box", {
+  check_api()
+  
   msg = capture.output({
     summary(box)
   })

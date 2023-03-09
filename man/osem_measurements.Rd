@@ -11,13 +11,31 @@ osem_measurements(x, ...)
 
 \method{osem_measurements}{default}(x, ...)
 
-\method{osem_measurements}{bbox}(x, phenomenon, exposure = NA,
-  from = NA, to = NA, columns = NA, ...,
-  endpoint = osem_endpoint(), progress = T, cache = NA)
+\method{osem_measurements}{bbox}(
+  x,
+  phenomenon,
+  exposure = NA,
+  from = NA,
+  to = NA,
+  columns = NA,
+  ...,
+  endpoint = osem_endpoint(),
+  progress = TRUE,
+  cache = NA
+)
 
-\method{osem_measurements}{sensebox}(x, phenomenon, exposure = NA,
-  from = NA, to = NA, columns = NA, ...,
-  endpoint = osem_endpoint(), progress = T, cache = NA)
+\method{osem_measurements}{sensebox}(
+  x,
+  phenomenon,
+  exposure = NA,
+  from = NA,
+  to = NA,
+  columns = NA,
+  ...,
+  endpoint = osem_endpoint(),
+  progress = TRUE,
+  cache = NA
+)
 }
 \arguments{
 \item{x}{Depending on the method, either
@@ -58,15 +76,15 @@ a bounding box spanning the whole world.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Get measurements from \strong{all} senseBoxes.
+\item \code{osem_measurements(default)}: Get measurements from \strong{all} senseBoxes.
 
-\item \code{bbox}: Get measurements by a spatial filter.
+\item \code{osem_measurements(bbox)}: Get measurements by a spatial filter.
 
-\item \code{sensebox}: Get measurements from a set of senseBoxes.
+\item \code{osem_measurements(sensebox)}: Get measurements from a set of senseBoxes.
+
 }}
-
 \examples{
-\donttest{
+\dontrun{
   # get measurements from all boxes on the phenomenon 'PM10' from the last 48h
   m = osem_measurements('PM10')
 
@@ -89,7 +107,7 @@ a bounding box spanning the whole world.
     'height'
   ))
 }
-\donttest{
+\dontrun{
   # get measurements from sensors within a custom WGS84 bounding box
   bbox = structure(c(7, 51, 8, 52), class = 'bbox')
   m = osem_measurements(bbox, 'Temperatur')
@@ -97,6 +115,7 @@ a bounding box spanning the whole world.
   # construct a bounding box 12km around berlin using the sf package,
   # and get measurements from stations within that box
   library(sf)
+  library(units)
   bbox2 = st_point(c(13.4034, 52.5120)) \%>\%
     st_sfc(crs = 4326) \%>\%
     st_transform(3857) \%>\% # allow setting a buffer in meters

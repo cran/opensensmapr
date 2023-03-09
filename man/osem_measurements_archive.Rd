@@ -7,8 +7,14 @@
 \usage{
 osem_measurements_archive(x, ...)
 
-\method{osem_measurements_archive}{sensebox}(x, fromDate,
-  toDate = fromDate, sensorFilter = ~T, ..., progress = T)
+\method{osem_measurements_archive}{sensebox}(
+  x,
+  fromDate,
+  toDate = fromDate,
+  sensorFilter = ~TRUE,
+  ...,
+  progress = TRUE
+)
 }
 \arguments{
 \item{x}{A `sensebox data.frame` of a single box, as retrieved via \code{\link{osem_box}},
@@ -30,7 +36,7 @@ A \code{tbl_df} containing observations of all selected sensors for each time st
 \description{
 This function is significantly faster than \code{\link{osem_measurements}} for large
 time-frames, as daily CSV dumps for each sensor from
-\href{http://archive.opensensemap.org}{archive.opensensemap.org} are used.
+\href{https://archive.opensensemap.org}{archive.opensensemap.org} are used.
 Note that the latest data available is from the previous day.
 }
 \details{
@@ -42,9 +48,9 @@ but continue the remaining download.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{sensebox}: Get daywise measurements for one or more sensors of a single box.
-}}
+\item \code{osem_measurements_archive(sensebox)}: Get daywise measurements for one or more sensors of a single box.
 
+}}
 \examples{
 \donttest{
   # fetch measurements for a single day

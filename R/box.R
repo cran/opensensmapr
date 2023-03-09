@@ -18,6 +18,10 @@
 #' @param to Only return boxes that were measuring earlier than this time
 #' @param phenomenon Only return boxes that measured the given phenomenon in the
 #'   time interval as specified through \code{date} or \code{from / to}
+#' @param bbox Only return boxes that are within the given boundingbox, 
+#'   vector of 4 WGS84 coordinates. 
+#'   Order is: longitude southwest, latitude southwest, longitude northeast, latitude northeast. 
+#'   Minimal and maximal values are: -180, 180 for longitude and -90, 90 for latitude.
 #' @param endpoint The URL of the openSenseMap API instance
 #' @param progress Whether to print download progress information, defaults to \code{TRUE}
 #' @param cache Whether to cache the result, defaults to false.
@@ -33,7 +37,7 @@
 #' @export
 #' @examples
 #'
-#' \donttest{
+#' \dontrun{
 #'   # get *all* boxes available on the API
 #'   b = osem_boxes()
 #'
@@ -67,7 +71,8 @@
 #'   b = osem_boxes(progress = FALSE)
 #' }
 osem_boxes = function (exposure = NA, model = NA, grouptag = NA,
-                      date = NA, from = NA, to = NA, phenomenon = NA,
+                      date = NA, from = NA, to = NA, phenomenon = NA, 
+                      bbox = NA,
                       endpoint = osem_endpoint(),
                       progress = TRUE,
                       cache = NA) {
@@ -93,11 +98,13 @@ osem_boxes = function (exposure = NA, model = NA, grouptag = NA,
   if (!is.na(model)) query$model = model
   if (!is.na(grouptag)) query$grouptag = grouptag
   if (!is.na(phenomenon)) query$phenomenon = phenomenon
+  if (all(!is.na(bbox))) query$bbox = paste(bbox, collapse = ', ')
 
   if (!is.na(to) && !is.na(from))
     query$date = parse_dateparams(from, to) %>% paste(collapse = ',')
   else if (!is.na(date))
     query$date = date_as_utc(date) %>% date_as_isostring()
+
 
   do.call(get_boxes_, query)
 }
@@ -118,7 +125,7 @@ osem_boxes = function (exposure = NA, model = NA, grouptag = NA,
 #' @seealso \code{\link{osem_clear_cache}}
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'   # get a specific box by ID
 #'   b = osem_box('57000b8745fd40c8196ad04c')
 #'
@@ -148,8 +155,11 @@ parse_senseboxdata = function (boxdata) {
   sensors = boxdata$sensors
   location = boxdata$currentLocation
   lastMeasurement = boxdata$lastMeasurementAt # rename for backwards compat < 0.5.1
-  boxdata[c('loc', 'locations', 'currentLocation', 'sensors', 'image', 'boxType', 'lastMeasurementAt')] = NULL
-  thebox = as.data.frame(boxdata, stringsAsFactors = F)
+  grouptags = boxdata$grouptag
+  boxdata[c(
+    'loc', 'locations', 'currentLocation', 'sensors', 'image', 'boxType', 'lastMeasurementAt', 'grouptag'
+  )] = NULL
+  thebox = as.data.frame(boxdata, stringsAsFactors = FALSE)
 
   # parse timestamps (updatedAt might be not defined)
   thebox$createdAt = isostring_as_date(thebox$createdAt)
@@ -158,10 +168,15 @@ parse_senseboxdata = function (boxdata) {
   if (!is.null(lastMeasurement))
     thebox$lastMeasurement = isostring_as_date(lastMeasurement)
 
+  # add empty sensortype to sensors without type
+  if(!('sensorType' %in% names(sensors[[1]]))) {
+    sensors[[1]]$sensorType <- NA
+  }
+
   # create a dataframe of sensors
   thebox$sensors = sensors %>%
     recursive_lapply(function (x) if (is.null(x)) NA else x) %>% # replace NULLs with NA
-    lapply(as.data.frame, stringsAsFactors = F) %>%
+    lapply(as.data.frame, stringsAsFactors = FALSE) %>%
     dplyr::bind_rows(.) %>%
     dplyr::select(phenomenon = title, id = X_id, unit, sensor = sensorType) %>%
     list
@@ -175,8 +190,26 @@ parse_senseboxdata = function (boxdata) {
   # extract coordinates & transform to simple feature object
   thebox$lon = location$coordinates[[1]]
   thebox$lat = location$coordinates[[2]]
+  thebox$locationtimestamp = isostring_as_date(location$timestamp)
   if (length(location$coordinates) == 3)
     thebox$height = location$coordinates[[3]]
+
+  # extract grouptag(s) from box 
+  if (length(grouptags) == 0)
+    thebox$grouptag = NULL
+  if (length(grouptags) > 0) {
+    # if box does not have grouptag dont set attribute
+    if(grouptags[[1]] == '') {
+      thebox$grouptag = NULL
+    }
+    else {
+      thebox$grouptag = grouptags[[1]]
+    }
+  }
+  if (length(grouptags) > 1)
+    thebox$grouptag2 = grouptags[[2]]
+  if (length(grouptags)  > 2)
+    thebox$grouptag3 = grouptags[[3]]
 
   # attach a custom class for methods
   osem_as_sensebox(thebox)
